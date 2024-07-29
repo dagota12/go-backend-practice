@@ -1,0 +1,41 @@
+# Compiled object files
+*.o
+*.so
+*.dylib
+*.dll
+*.a
+
+# Executables
+*.exe
+*.app
+*.jar
+
+# Shared libraries and object files
+lib/*
+build/*
+
+# Test binaries
+test/
+
+# Output, log, and cache files
+*.log
+*.tmp
+*.orig
+*.rej
+*.swp
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Dependency directories
+/node_modules
+/vendor
+
+# Caching directories
+.cache
+
+# IDE-specific files
+.idea
+*.iml
+.vscode
