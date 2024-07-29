@@ -8,7 +8,7 @@ func main() {
 	var n int
 	var name string
 	//take basic input
-	fmt.Print("Enter Number your name: ")
+	fmt.Print("Enter your name: ")
 	fmt.Scan(&name)
 
 	fmt.Print("Enter Number of subjects: ")
