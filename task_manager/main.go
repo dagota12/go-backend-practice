@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
+	"goPractice/task_manager/controllers"
+	"goPractice/task_manager/data"
+	"goPractice/task_manager/router"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -23,19 +24,12 @@ var tasks = map[string]Task{
 }
 
 func main() {
-	router := gin.Default()
+	router_inst := gin.Default()
+	task_service := data.NewTaskService()
+	// task_service.Tasks = tasks
 
-	router.GET("/ping", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
-	router.GET("/tasks", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{
-			"tasks": tasks})
-	})
+	task_controller := controllers.NewTaskController(task_service)
+	router.SetUpRouter(router_inst, task_controller)
 
-	fmt.Println("Task Manager-API GIN")
-
-	router.Run(":8080")
+	router_inst.Run(":8080")
 }
