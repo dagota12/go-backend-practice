@@ -1,4 +1,4 @@
-## Task Manger API
+## Task Manger API with MONGO DB
 
 ### overview
 
@@ -20,20 +20,20 @@ BaseURL
 
 ```json
 {
-  "1": {
-    "id": "1",
-    "title": "Task 1",
-    "description": "First task Update",
-    "due_date": "2024-07-31T23:43:39.6984829+03:00",
-    "status": "Pending"
-  },
-  "2": {
-    "id": "2",
-    "title": "Task 2",
-    "description": "Second task",
-    "due_date": "2024-08-01T23:43:39.6984829+03:00",
-    "status": "In Progress"
-  }
+    {
+        "id": "66ad4284dad62d1f3a862cc2",
+        "title": "Shopping",
+        "description": "buy item",
+        "due_date": "2024-07-31T20:43:39.698Z",
+        "status": "Completed"
+    },
+    {
+        "id": "06ad4284dad62d1f3a862cc2",
+        "title": "Meeting with Clare",
+        "description": "meeting",
+        "due_date": "2024-07-31T20:43:39.698Z",
+        "status": "Completed"
+    }
 }
 ```
 
@@ -47,35 +47,45 @@ BaseURL
 
 ```json
 {
-  "id": "1",
-  "title": "Task 1",
-  "description": "First task Update",
-  "due_date": "2024-07-31T23:43:39.6984829+03:00",
-  "status": "Pending"
+  "id": "06ad4284dad62d1f3a862cc2",
+  "title": "Meeting with Clare",
+  "description": "meeting",
+  "due_date": "2024-07-31T20:43:39.698Z",
+  "status": "Completed"
 }
 ```
 
 **Error handling** if `id` not found
 
-    curl --location --globoff 'http://localhost:8080/api/task/43'
+    curl --location 'http://localhost:8080/api/task/66adee35d74df484e83593b0'
 
-- status code: **400** - badRequest
+- status code: **404** - NotFound
 
 ```json
 {
-  "error": "task with id 43 not found"
+  "error": "mongo: no documents in result"
 }
 ```
 
 **endpoint:** `/task` `POST`
 
 **Description**: Add Task tasks returns the newly added task
+**Request**
+
+```json
+{
+  "title": "New Task",
+  "description": "describtion",
+  "due_date": "2024-07-31T23:43:39.6984829+03:00",
+  "status": "Pending"
+}
+```
 
 **Response**
 
 ```json
 {
-  "id": "5",
+  "id": "66ae29b909be0b7a467a5673",
   "title": "New Task",
   "description": "describtion",
   "due_date": "2024-07-31T23:43:39.6984829+03:00",
@@ -87,13 +97,24 @@ BaseURL
 
 **Description**: updates Task with ID = `id`
 
+**Request**
+
+```json
+{
+  "title": "Task Update",
+  "description": "tempora",
+  "due_date": "2024-07-31T23:43:39.6984829+03:00",
+  "status": "Pending"
+}
+```
+
 **Response**
 
 ```json
 {
-  "id": "1",
-  "title": "Task 1",
-  "description": "First task Update",
+  "id": "66ad4284dad62d1f3a862cc2",
+  "title": "Task Update",
+  "description": "tempora",
   "due_date": "2024-07-31T23:43:39.6984829+03:00",
   "status": "Pending"
 }
@@ -103,35 +124,17 @@ BaseURL
 
 ```json
 {
-  "error": "task with id 23 not found"
-}
-```
-
-**Error handling** if ID uri `id` is not equal to the body `id`
-
-```curl
-curl --location --request PUT 'http://localhost:8080/api/task/3' \
---header 'Content-Type: application/json' \
---data '{
-        "id": "1",
-        "title": "Task 1",
-        "description": "First task Update",
-        "due_date": "2024-07-31T23:43:39.6984829+03:00",
-        "status": "Pending"
-    }'
-```
-
-- status code: **400** - BadRequest
-
-```json
-{
-  "error": "task ID in request body (1) does not match task ID in URL (3)"
+  "error": "mongo: no documents in result"
 }
 ```
 
 **endpoint:** `/task/:id` `DELETE`
 
 **Description**: delete Task with ID = `id`
+
+**Request**
+
+    curl --location --request DELETE 'http://localhost:8080/api/task/66ad4284dad62d1f3a862cc2'
 
 **Response**
 
@@ -141,6 +144,6 @@ curl --location --request PUT 'http://localhost:8080/api/task/3' \
 
 ```json
 {
-  "error": "task with id 23 not found"
+  "error": "mongo: no documents in result"
 }
 ```
