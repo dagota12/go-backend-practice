@@ -19,7 +19,7 @@ func NewTaskController(taskService data.TaskService) *TaskController {
 }
 func (tc *TaskController) CreateTask(c *gin.Context) {
 	var task models.Task
-	if err := c.BindJSON(&task); err != nil {
+	if err := c.ShouldBindJSON(&task); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 
@@ -53,7 +53,7 @@ func (tc *TaskController) UpdateTask(c *gin.Context) {
 	id := c.Param("id")
 	var task models.Task
 	if err := c.BindJSON(&task); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "bad payload," + err.Error()})
 		return
 	}
 

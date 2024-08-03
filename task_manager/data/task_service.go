@@ -1,72 +1,124 @@
 package data
 
 import (
-	"fmt"
+	"context"
 	"goPractice/task_manager/models"
-	"time"
+	"log"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type TaskService interface {
 	CreateTask(task models.Task) (models.Task, error)
-	GetTasks() map[string]models.Task
+	GetTasks() []models.Task
 	GetTask(id string) (models.Task, error)
 	UpdateTask(id string, task models.Task) (models.Task, error)
 	DeleteTask(id string) error
 }
 type taskService struct {
-	Tasks map[string]models.Task
+	tasks *mongo.Collection
 }
 
-func NewTaskService() *taskService {
+func NewTaskService(collection *mongo.Collection) *taskService {
 	return &taskService{
-		Tasks: map[string]models.Task{
-			"1": {ID: "1", Title: "Task 1", Description: "First task", DueDate: time.Now(), Status: "Pending"},
-			"2": {ID: "2", Title: "Task 2", Description: "Second task", DueDate: time.Now().AddDate(0, 0, 1), Status: "In Progress"},
-			"3": {ID: "3", Title: "Task 3", Description: "Third task", DueDate: time.Now().AddDate(0, 0, 2), Status: "Completed"},
-		},
+		tasks: collection,
 	}
 }
 
 // CreateTask implements TaskService.
 func (t *taskService) CreateTask(task models.Task) (models.Task, error) {
+	res, err := t.tasks.InsertOne(context.TODO(), task)
 
-	if _, ok := t.Tasks[task.ID]; ok {
-		return models.Task{}, fmt.Errorf("task with id %s already exists", task.ID)
+	if err != nil {
+		log.Println(err.Error())
+		return models.Task{}, err
 	}
-	t.Tasks[task.ID] = task
+	task.ID = res.InsertedID.(primitive.ObjectID)
 	return task, nil
 }
 
 // DeleteTask implements TaskService.
 func (t *taskService) DeleteTask(id string) error {
-	if _, ok := t.Tasks[id]; !ok {
-		return fmt.Errorf("task with id %s not found", id)
+
+	oId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Println(err.Error())
+		return err
 	}
-	delete(t.Tasks, id)
+	res, err := t.tasks.DeleteOne(context.TODO(), bson.M{"_id": oId})
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	if res.DeletedCount < 1 {
+		return mongo.ErrNoDocuments
+	}
 	return nil
 }
 
 // GetTask implements TaskService.
 func (t *taskService) GetTask(id string) (models.Task, error) {
-	if _, ok := t.Tasks[id]; !ok {
-		return models.Task{}, fmt.Errorf("task with id %s not found", id)
+	log.Println("getting task...")
+	oId, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		log.Println(err.Error())
+		return models.Task{}, err
 	}
-	return t.Tasks[id], nil
+	var task models.Task
+	res := t.tasks.FindOne(context.TODO(), bson.M{"_id": oId})
+
+	err = res.Decode(&task)
+	if err != nil {
+		log.Println(err.Error())
+		return models.Task{}, err
+	}
+
+	return task, nil
 }
 
 // GetTasks implements TaskService.
-func (t *taskService) GetTasks() map[string]models.Task {
-	return t.Tasks
+func (t *taskService) GetTasks() []models.Task {
+
+	res, err := t.tasks.Find(context.TODO(), bson.D{{}})
+	if err != nil {
+		log.Println(err.Error())
+		return []models.Task{}
+	}
+	var tasks []models.Task
+
+	for res.Next(context.TODO()) {
+		var task models.Task
+		err := res.Decode(&task)
+		if err != nil {
+			log.Println(err.Error())
+			return []models.Task{}
+		}
+
+		tasks = append(tasks, task)
+	}
+	return tasks
 }
 
 // UpdateTask implements TaskService.
 func (t *taskService) UpdateTask(id string, task models.Task) (models.Task, error) {
-	if _, ok := t.Tasks[id]; !ok {
-		return models.Task{}, fmt.Errorf("task with id %s not found", id)
+	log.Println("updating task...")
+	oId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Println(err.Error())
+		return models.Task{}, err
 	}
-	if task.ID != id {
-		return models.Task{}, fmt.Errorf("task ID in request body (%s) does not match task ID in URL (%s)", task.ID, id)
+	res, err := t.tasks.UpdateOne(context.TODO(), bson.M{"_id": oId}, bson.D{{Key: "$set", Value: task}})
+	if err != nil {
+		log.Println(err.Error())
+		return models.Task{}, err
 	}
-	t.Tasks[id] = task
+	if res.MatchedCount < 1 {
+		return models.Task{}, mongo.ErrNoDocuments
+	}
+	task.ID = oId
 	return task, nil
 }
