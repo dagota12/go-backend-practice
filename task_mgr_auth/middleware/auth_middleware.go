@@ -2,8 +2,10 @@ package middleware
 
 import (
 	"fmt"
+	"goPractice/task_manager/config"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -59,7 +61,7 @@ func ParseToken(authHeader string) (jwt.MapClaims, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method %v", token.Header["alg"])
 		}
-		return []byte("secret"), nil
+		return []byte(config.JWT_SECRET), nil
 	})
 	if err != nil {
 		return nil, err
@@ -71,4 +73,18 @@ func ParseToken(authHeader string) (jwt.MapClaims, error) {
 	}
 
 	return claims, nil
+}
+
+func GenerateToken(userID string, role string) (string, error) {
+	claims := Claims{
+		UserID: userID,
+		Role:   role,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	return token.SignedString([]byte(config.JWT_SECRET))
 }

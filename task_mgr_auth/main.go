@@ -25,6 +25,9 @@ type Server struct {
 func (s *Server) Run() {
 	log.Println("Starting server on port " + s.Port)
 	s.Router = gin.Default()
+
+	//force color tobe displayed in console
+	gin.ForceConsoleColor()
 	s.DB = config.NewMongoClient().Database("test")
 	api := s.Router.Group("/api")
 

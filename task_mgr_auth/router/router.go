@@ -10,11 +10,11 @@ import (
 func SetUpTaskRouter(r *gin.RouterGroup, tc *controllers.TaskController) {
 	{
 		taskGroup := r.Group("/task")
-		taskGroup.GET("/", middleware.Authorize("admin"), tc.GetTasks)
-		taskGroup.POST("/", tc.CreateTask)
-		taskGroup.GET("/:id", tc.GetTask)
-		taskGroup.PUT("/:id", tc.UpdateTask)
-		taskGroup.DELETE("/:id", tc.DeleteTask)
+		taskGroup.GET("/", middleware.Authorize("user", "admin"), tc.GetTasks)
+		taskGroup.POST("/", middleware.Authorize("admin"), tc.CreateTask)
+		taskGroup.GET("/:id", middleware.Authorize("user", "admin"), tc.GetTask)
+		taskGroup.PUT("/:id", middleware.Authorize("admin"), tc.UpdateTask)
+		taskGroup.DELETE("/:id", middleware.Authorize("admin"), tc.DeleteTask)
 	}
 	r.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{

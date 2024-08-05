@@ -2,9 +2,12 @@ package data
 
 import (
 	"context"
+	"fmt"
 	"goPractice/task_manager/models"
+	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -23,16 +26,21 @@ func NewUserService(collection *mongo.Collection) *userService {
 	}
 }
 func (us *userService) CreateUser(user models.User) (models.User, error) {
+	res, err := us.users.InsertOne(context.TODO(), user)
+	if err != nil {
+		return models.User{}, fmt.Errorf("error to create user: %v", err.Error())
+	}
+	user.ID = res.InsertedID.(primitive.ObjectID)
 
-	return models.User{}, nil
+	return user, nil
 
 }
 func (us *userService) FilterUser(filter bson.M) (models.User, error) {
 	var user models.User
-	res := us.users.FindOne(context.TODO(), filter)
+	err := us.users.FindOne(context.TODO(), filter).Decode(&user)
 
-	err := res.Decode(&user)
 	if err != nil {
+		log.Println(err.Error())
 		return models.User{}, err
 	}
 	return user, nil
