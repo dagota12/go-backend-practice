@@ -2,6 +2,7 @@ package router
 
 import (
 	"goPractice/task_manager/controllers"
+	"goPractice/task_manager/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -9,7 +10,7 @@ import (
 func SetUpTaskRouter(r *gin.RouterGroup, tc *controllers.TaskController) {
 	{
 		taskGroup := r.Group("/task")
-		taskGroup.GET("/", tc.GetTasks)
+		taskGroup.GET("/", middleware.Authorize("admin"), tc.GetTasks)
 		taskGroup.POST("/", tc.CreateTask)
 		taskGroup.GET("/:id", tc.GetTask)
 		taskGroup.PUT("/:id", tc.UpdateTask)

@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"errors"
 	"goPractice/task_manager/models"
 	"log"
 
@@ -74,7 +75,7 @@ func (t *taskService) GetTask(id string) (models.Task, error) {
 	err = res.Decode(&task)
 	if err != nil {
 		log.Println(err.Error())
-		return models.Task{}, err
+		return models.Task{}, errors.New("task not found")
 	}
 
 	return task, nil
