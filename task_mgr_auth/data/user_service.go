@@ -13,7 +13,7 @@ import (
 
 type UserService interface {
 	CreateUser(user models.User) (models.User, error)
-	FilterUser(filter bson.M) (models.User, error)
+	FilterUser(username string) (models.User, error)
 }
 type userService struct {
 	users *mongo.Collection
@@ -35,7 +35,8 @@ func (us *userService) CreateUser(user models.User) (models.User, error) {
 	return user, nil
 
 }
-func (us *userService) FilterUser(filter bson.M) (models.User, error) {
+func (us *userService) FilterUser(username string) (models.User, error) {
+	filter := bson.M{"username": username}
 	var user models.User
 	err := us.users.FindOne(context.TODO(), filter).Decode(&user)
 

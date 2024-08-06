@@ -4,13 +4,22 @@
 
 Task Management REST API using Go programming language and Gin Framework. This API will support basic CRUD operations for managing tasks.
 
+also includes basic role based authentication system where users can register and login to acces the resource based on their role
+
+### outline
+
+- [tasks](#tasks)
+- [users](#users)
+
 ## End Points
+
+## tasks
 
 BaseURL
 
-    http://localhost:8080/api
+    http://localhost:8080/
 
-**endpoint:** `/task` `GET`
+**endpoint:** `api/task` `GET`
 
 **Description**: Get all tasks
 
@@ -37,7 +46,7 @@ BaseURL
 }
 ```
 
-**endpoint:** `/task/:id` `GET`
+**endpoint:** `api/task/:id` `GET`
 
 **Description**: get tasks with ID = `id`
 
@@ -67,7 +76,7 @@ BaseURL
 }
 ```
 
-**endpoint:** `/task` `POST`
+**endpoint:** `api/task` `POST`
 
 **Description**: Add Task tasks returns the newly added task
 **Request**
@@ -93,7 +102,7 @@ BaseURL
 }
 ```
 
-**endpoint:** `/task/:id` `PUT`
+**endpoint:** `api/task/:id` `PUT`
 
 **Description**: updates Task with ID = `id`
 
@@ -128,7 +137,7 @@ BaseURL
 }
 ```
 
-**endpoint:** `/task/:id` `DELETE`
+**endpoint:** `api/task/:id` `DELETE`
 
 **Description**: delete Task with ID = `id`
 
@@ -146,4 +155,72 @@ BaseURL
 {
   "error": "mongo: no documents in result"
 }
+```
+
+## users
+
+### register
+
+**endpoint:** `api/user/register` `POST`
+
+**Description**: register user
+
+**Request**
+
+```sh
+    curl --location 'http://localhost:8080/api/user/register' \
+    --data '{
+        "username":"bob",
+        "password": "alpha",
+        "role": "user"
+    }'
+```
+
+**Response**
+
+```json
+{
+  "id": "66b22761a7177ebbe1efd2b4",
+  "username": "bob"
+}
+```
+
+**error handling** bad request body
+
+- eg if the json body is not provided
+
+```sh
+      curl --location --request POST 'http://localhost:8080/api/user/register'
+```
+
+```json
+{
+  "error": "Login faild Error while Parsing the request body"
+}
+```
+
+**error handling** conflict usernames
+
+- eg if the json body user name already exist in database
+
+```json
+{
+  "error": "username already exists"
+}
+```
+
+### login
+
+### register
+
+**endpoint:** `api/user/login` `POST`
+
+**Description**: user login to the system
+
+**Request**
+
+```sh
+  curl --location 'http://localhost:8080/api/user/login' \
+  --form 'username="bob"' \
+  --form 'password="fakepwd"'
 ```

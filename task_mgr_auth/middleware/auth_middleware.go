@@ -3,12 +3,14 @@ package middleware
 import (
 	"fmt"
 	"goPractice/task_manager/config"
+	"log"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // struct for the payload in the JWT token
@@ -87,4 +89,15 @@ func GenerateToken(userID string, role string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	return token.SignedString([]byte(config.JWT_SECRET))
+}
+func HashPassword(password string) (string, error) {
+	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(hashedPwd), err
+}
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	if err != nil {
+		log.Println("comparing hash and password:", err.Error())
+	}
+	return err == nil
 }
