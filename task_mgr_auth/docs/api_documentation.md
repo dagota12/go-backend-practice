@@ -21,7 +21,27 @@ BaseURL
 
 **endpoint:** `api/task` `GET`
 
-**Description**: Get all tasks
+**Description**: Get all tasks of that user only
+
+**Response**
+
+- status code: **200** - statusSuccess
+
+```json
+{
+    {
+        "id": "66ad4284dad62d1f3a862cc2",
+        "title": "Shopping",
+        "description": "buy item",
+        "due_date": "2024-07-31T20:43:39.698Z",
+        "status": "Completed"
+    }
+}
+```
+
+**endpoint:** `api/task/all` `GET`
+
+**Description**: Get all tasks only admin allowed
 
 **Response**
 
@@ -64,15 +84,12 @@ BaseURL
 }
 ```
 
-**Error handling** if `id` not found
-
-    curl --location 'http://localhost:8080/api/task/66adee35d74df484e83593b0'
-
-- status code: **404** - NotFound
+**Error handling**
+statuscodes: [400,401,403]
 
 ```json
 {
-  "error": "mongo: no documents in result"
+  "error": "String"
 }
 ```
 
@@ -129,11 +146,11 @@ BaseURL
 }
 ```
 
-**Error handling** if `id` not found
+**Error handling**
 
 ```json
 {
-  "error": "mongo: no documents in result"
+  "error": "String"
 }
 ```
 
@@ -149,11 +166,11 @@ BaseURL
 
 - status code: 204 - StatusNoContent
 
-**Error handling** if `id` not found
+**Error handling**
 
 ```json
 {
-  "error": "mongo: no documents in result"
+  "error": "String"
 }
 ```
 
@@ -193,9 +210,9 @@ curl --location 'http://localhost:8080/api/user/register' \
 
 **Error Handling**
 
-```
+```json
 {
-    "error": string
+  "error": "String"
 }
 ```
 
@@ -227,7 +244,57 @@ curl --location 'http://localhost:8080/api/user/register' \
 }
 ```
 
+- status code 400-badRequest
+
 **Error Handling**
+
+```json
+{
+  "error": "String"
+}
+```
+
+## Admin Functionality
+
+**endpoint:** `api/user` `GET`
+
+**Description**: fetches all users only admins allowed
+
+**Request**
+
+```json
+    {
+        "id": "66b299c914f5d35013c5d1ef",
+        "username": "admin",
+        "role": "admin"
+    },
+    {
+        "id": "66b2a2987e6eb639cf525119",
+        "username": "brad",
+        "role": "user"
+    },
+```
+
+**endpoint:** `api/user/:id` `POST`
+
+**Description**: promotes the user to an admin only admins can promote other users to admin
+
+**Request**
+
+- URI parameter
+  - id: `ObjectId`
+
+**reponse**
+
+- status code 200-Ok
+
+```json
+{
+  "message": "String"
+}
+```
+
+**error handling**
 
 ```json
 {
