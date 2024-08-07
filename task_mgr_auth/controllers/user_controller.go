@@ -17,6 +17,16 @@ type UserController struct {
 func NewUserController(service data.UserService) *UserController {
 	return &UserController{userService: service}
 }
+func (uc *UserController) GetUsers(c *gin.Context) {
+
+	users, err := uc.userService.GetAllUsers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while getting all users"})
+		return
+	}
+
+	c.JSON(http.StatusOK, users)
+}
 func (uc *UserController) CreateUser(c *gin.Context) {
 
 	var user models.User
@@ -32,6 +42,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 		c.JSON(http.StatusConflict, gin.H{"error": "username already exists"})
 		return
 	}
+	//hash password using bcrypt
 	hashedPwd, err := middleware.HashPassword(user.Password)
 	if err != nil {
 		log.Println(err.Error())
@@ -39,6 +50,20 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 		return
 	}
 	user.Password = hashedPwd
+	//create the user in the database
+	//check if database is empty or if there are no users this user role becomes admin
+	users, err := uc.userService.GetAllUsers()
+	if err != nil {
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while getting all users"})
+		return
+	}
+	if len(users) == 0 {
+		user.Role = "admin"
+	} else {
+		user.Role = "user"
+	}
+
 	newUser, err := uc.userService.CreateUser(user)
 	if err != nil {
 		log.Println(err.Error())
@@ -81,4 +106,15 @@ func (uc *UserController) CreateAdmin(c *gin.Context) {
 }
 func (uc *UserController) AdminLogin(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "admin login"})
+}
+func (uc *UserController) PromoteUser(c *gin.Context) {
+
+	id := c.Param("id")
+
+	if _, err := uc.userService.PromoteUser(id); err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while promoting user"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "admin promoted"})
 }

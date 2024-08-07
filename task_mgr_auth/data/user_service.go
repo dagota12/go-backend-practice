@@ -14,6 +14,8 @@ import (
 type UserService interface {
 	CreateUser(user models.User) (models.User, error)
 	FilterUser(username string) (models.User, error)
+	GetAllUsers() ([]models.UserOut, error)
+	PromoteUser(string) (bool, error)
 }
 type userService struct {
 	users *mongo.Collection
@@ -46,4 +48,41 @@ func (us *userService) FilterUser(username string) (models.User, error) {
 	}
 	return user, nil
 
+}
+
+// gets all users from database
+func (us *userService) GetAllUsers() ([]models.UserOut, error) {
+	var users []models.UserOut
+	cursor, err := us.users.Find(context.TODO(), bson.M{})
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+	for cursor.Next(context.TODO()) {
+		var user models.UserOut
+		err := cursor.Decode(&user)
+		if err != nil {
+			log.Println(err.Error())
+			return nil, err
+		}
+		users = append(users, user)
+	}
+	return users, nil
+}
+
+// promote user
+func (us *userService) PromoteUser(id string) (bool, error) {
+	oId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Println(err.Error())
+		return false, err
+	}
+	filter := bson.M{"_id": oId}
+	update := bson.D{{Key: "$set", Value: bson.M{"role": "admin"}}}
+	res, err := us.users.UpdateOne(context.TODO(), filter, update)
+	if err != nil || res.ModifiedCount < 1 {
+		log.Println("promoting user", err)
+		return false, err
+	}
+	return true, nil
 }

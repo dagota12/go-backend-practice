@@ -39,7 +39,9 @@ func Authorize(allowedRoles ...string) gin.HandlerFunc {
 		}
 		for _, role := range allowedRoles {
 			if claim["role"] == role {
-				ctx.Set("claim", claim)
+				log.Printf("CLAIM: user_id: %v, role: %v", claim["user_id"], claim["role"])
+				ctx.Set("user_id", claim["user_id"])
+				ctx.Set("role", claim["role"])
 				ctx.Next()
 				return
 			}

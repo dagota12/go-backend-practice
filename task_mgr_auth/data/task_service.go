@@ -14,6 +14,7 @@ import (
 type TaskService interface {
 	CreateTask(task models.Task) (models.Task, error)
 	GetTasks() []models.Task
+	GetUserTasks(id string) []models.Task
 	GetTask(id string) (models.Task, error)
 	UpdateTask(id string, task models.Task) (models.Task, error)
 	DeleteTask(id string) error
@@ -38,6 +39,31 @@ func (t *taskService) CreateTask(task models.Task) (models.Task, error) {
 	}
 	task.ID = res.InsertedID.(primitive.ObjectID)
 	return task, nil
+}
+func (t *taskService) GetUserTasks(user_id string) []models.Task {
+	oId, err := primitive.ObjectIDFromHex(user_id)
+	if err != nil {
+		log.Println(err.Error())
+		return []models.Task{}
+	}
+	cursor, err := t.tasks.Find(context.TODO(), bson.M{"user_id": oId})
+	if err != nil {
+		log.Println(err.Error())
+		return []models.Task{}
+	}
+	var tasks []models.Task
+
+	for cursor.Next(context.TODO()) {
+		var task models.Task
+		err := cursor.Decode(&task)
+		if err != nil {
+			log.Println(err.Error())
+			return []models.Task{}
+		}
+
+		tasks = append(tasks, task)
+	}
+	return tasks
 }
 
 // DeleteTask implements TaskService.

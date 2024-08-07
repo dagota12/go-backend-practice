@@ -1,4 +1,4 @@
-## Task Manger API with MONGO DB
+## Task Manger API with MONGO DB and JWT - Auth
 
 ### overview
 
@@ -163,59 +163,51 @@ BaseURL
 
 **endpoint:** `api/user/register` `POST`
 
-**Description**: register user
+**Description**: register user, only admin can register a user if there is no user registerd the first to register himself becomes admin
+
+- Input form data
+  - username: String, reqired
+  - pasword: String, required
 
 **Request**
 
 ```sh
-    curl --location 'http://localhost:8080/api/user/register' \
-    --data '{
-        "username":"bob",
-        "password": "alpha",
-        "role": "user"
-    }'
+curl --location 'http://localhost:8080/api/user/register' \
+--header 'Content-Type: application/json' \
+--data '{
+    "username":"alex",
+    "password":"fakepwd"
+}p'
 ```
 
-**Response**
+**response**
+
+- returns the newly inserted user
 
 ```json
 {
-  "id": "66b22761a7177ebbe1efd2b4",
-  "username": "bob"
+  "id": "String",
+  "username": "String"
 }
 ```
 
-**error handling** bad request body
+**Error Handling**
 
-- eg if the json body is not provided
-
-```sh
-      curl --location --request POST 'http://localhost:8080/api/user/register'
 ```
-
-```json
 {
-  "error": "Login faild Error while Parsing the request body"
-}
-```
-
-**error handling** conflict usernames
-
-- eg if the json body user name already exist in database
-
-```json
-{
-  "error": "username already exists"
+    "error": string
 }
 ```
 
 ### login
 
-### register
-
 **endpoint:** `api/user/login` `POST`
 
 **Description**: user login to the system
+
+- Input form data
+  - username: String, reqired
+  - pasword: String, required
 
 **Request**
 
@@ -223,4 +215,22 @@ BaseURL
   curl --location 'http://localhost:8080/api/user/login' \
   --form 'username="bob"' \
   --form 'password="fakepwd"'
+```
+
+**response**
+
+- returns an access token for the current user
+
+```json
+{
+  "token": "String"
+}
+```
+
+**Error Handling**
+
+```json
+{
+  "error": "String"
+}
 ```
