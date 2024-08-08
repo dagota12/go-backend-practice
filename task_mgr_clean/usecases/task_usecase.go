@@ -6,7 +6,7 @@ import (
 )
 
 type TaksUsecase interface {
-	GetTask() []domain.Task
+	GetTasks() []domain.Task
 	GetUserTasks(id string) []domain.Task
 	CreateTask(task domain.Task) (domain.Task, error)
 	UpdateTask(id string, task domain.Task) (domain.Task, error)
@@ -14,34 +14,35 @@ type TaksUsecase interface {
 }
 
 type taskUsecase struct {
-	tasks repositories.TaskRepository
+	taskRepository repositories.TaskRepository
+}
+
+func NewTaskUsecase(tasks repositories.TaskRepository) TaksUsecase {
+	return &taskUsecase{taskRepository: tasks}
 }
 
 // CreateTask implements TaksUsecase.
 func (t *taskUsecase) CreateTask(task domain.Task) (domain.Task, error) {
-	panic("unimplemented")
-}
-
-// DeleteTask implements TaksUsecase.
-func (t *taskUsecase) DeleteTask(id string) error {
-	panic("unimplemented")
+	task, err := t.taskRepository.CreateTask(task)
+	return task, err
 }
 
 // GetTask implements TaksUsecase.
-func (t *taskUsecase) GetTask() []domain.Task {
-	panic("unimplemented")
+func (t *taskUsecase) GetTasks() []domain.Task {
+	return t.taskRepository.GetTasks()
 }
 
 // GetUserTasks implements TaksUsecase.
 func (t *taskUsecase) GetUserTasks(id string) []domain.Task {
-	panic("unimplemented")
+	return t.taskRepository.GetUserTasks(id)
 }
 
 // UpdateTask implements TaksUsecase.
 func (t *taskUsecase) UpdateTask(id string, task domain.Task) (domain.Task, error) {
-	panic("unimplemented")
+	return t.taskRepository.UpdateTask(id, task)
 }
 
-func NewTaskUsecase(tasks repositories.TaskRepository) TaksUsecase {
-	return &taskUsecase{tasks: tasks}
+// DeleteTask implements TaksUsecase.
+func (t *taskUsecase) DeleteTask(id string) error {
+	return t.taskRepository.DeleteTask(id)
 }
