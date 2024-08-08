@@ -6,8 +6,9 @@ import (
 )
 
 type TaksUsecase interface {
+	GetTask(id string) (domain.Task, error)
 	GetTasks() []domain.Task
-	GetUserTasks(id string) []domain.Task
+	GetUserTasks(user_id string) []domain.Task
 	CreateTask(task domain.Task) (domain.Task, error)
 	UpdateTask(id string, task domain.Task) (domain.Task, error)
 	DeleteTask(id string) error
@@ -19,6 +20,11 @@ type taskUsecase struct {
 
 func NewTaskUsecase(tasks repositories.TaskRepository) TaksUsecase {
 	return &taskUsecase{taskRepository: tasks}
+}
+
+// GetTask implements TaksUsecase.
+func (t *taskUsecase) GetTask(id string) (domain.Task, error) {
+	return t.taskRepository.GetTask(id)
 }
 
 // CreateTask implements TaksUsecase.
@@ -33,8 +39,8 @@ func (t *taskUsecase) GetTasks() []domain.Task {
 }
 
 // GetUserTasks implements TaksUsecase.
-func (t *taskUsecase) GetUserTasks(id string) []domain.Task {
-	return t.taskRepository.GetUserTasks(id)
+func (t *taskUsecase) GetUserTasks(user_id string) []domain.Task {
+	return t.taskRepository.GetUserTasks(user_id)
 }
 
 // UpdateTask implements TaksUsecase.
