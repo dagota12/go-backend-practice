@@ -1,11 +1,7 @@
 package main
 
-import (
-	"fmt"
-	"goPractice/task_manager/infrastructure"
-)
+import "goPractice/task_manager/delivery/routers"
 
 func main() {
-	infrastructure.NewMongoClient()
-	fmt.Println("Hello world")
+	routers.Setup()
 }

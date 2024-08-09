@@ -22,7 +22,7 @@ func init() {
 	DB_URI = os.Getenv("DB_URI")
 	DB_NAME = os.Getenv("DB_NAME")
 	JWT_SECRET = os.Getenv("JWT_SECRET")
-	EXP_TIME, _ = strconv.Atoi(os.Getenv("EXP_TIME"))
+	EXP_TIME, _ = strconv.Atoi(os.Getenv("JWT_EXP"))
 
 }
 

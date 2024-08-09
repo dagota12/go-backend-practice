@@ -1,6 +1,7 @@
 package infrastructure
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -25,8 +26,8 @@ func Authorize(allowedRoles ...string) gin.HandlerFunc {
 		}
 		for _, role := range allowedRoles {
 			if claim.Role == role {
-				// log.Printf("CLAIM: user_id: %v, role: %v", claim["user_id"], claim["role"])
-				ctx.Set("claim", claim)
+				log.Printf("CLAIM: role: %v", claim.Role)
+				ctx.Set("claim", &claim)
 				ctx.Next()
 				return
 			}

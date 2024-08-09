@@ -14,19 +14,19 @@ type TaskController struct {
 	taskUsecase usecases.TaksUsecase
 }
 
-func NewTaskCotroller(usecase usecases.TaksUsecase) *TaskController {
+func NewTaskController(usecase usecases.TaksUsecase) *TaskController {
 	return &TaskController{taskUsecase: usecase}
 }
 
 // get current user claims from the middleware
 func getClaims(c *gin.Context) (map[string]string, error) {
-	claims, ok := c.Get("claims")
+	claims, ok := c.Get("claim")
 
 	//if claims does not exist, return unauthorized
 	if !ok {
 		return nil, errors.New("unauthorized")
 	}
-	user := claims.(infrastructure.Claims)
+	user := claims.(*infrastructure.Claims)
 	data := map[string]string{"user_id": user.UserID, "role": user.Role}
 	return data, nil
 }

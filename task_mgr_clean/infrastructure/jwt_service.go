@@ -34,19 +34,20 @@ func ParseToken(authHeader string) (Claims, error) {
 	if len(authParts) != 2 || strings.ToLower(authParts[0]) != "bearer" {
 		return Claims{}, fmt.Errorf("invalid authorization header format")
 	}
-
-	token, err := jwt.Parse(authParts[1], func(token *jwt.Token) (interface{}, error) {
+	claims := Claims{}
+	token, err := jwt.ParseWithClaims(authParts[1], &claims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method %v", token.Header["alg"])
 		}
 		return []byte(JWT_SECRET), nil
 	})
+
 	if err != nil {
 		return Claims{}, err
 	}
-	claims, ok := token.Claims.(Claims) //type assertion for Claims
+
 	fmt.Println("Claims: ", claims)
-	if !ok || !token.Valid {
+	if !token.Valid {
 		return Claims{}, fmt.Errorf("invalid JWT token")
 	}
 
