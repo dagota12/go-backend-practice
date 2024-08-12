@@ -35,7 +35,7 @@ BaseURL
         "id": "ObjectId",
         "title": "String",
         "description": "String",
-        "due_date": "UTC-time",
+        "due_date": "ISODate",
         "status": "String"
     }
 }
@@ -55,7 +55,7 @@ BaseURL
         "id": "ObjectId",
         "title": "String",
         "description": "String",
-        "due_date": "UTC-time",
+        "due_date": "ISODate",
         "status": "String"
     }
 }
@@ -74,13 +74,15 @@ BaseURL
   "id": "ObjectId",
   "title": "String",
   "description": "String",
-  "due_date": "UTC-time",
+  "due_date": "ISODate",
   "status": "String"
 }
 ```
 
 **Error handling**
-statuscodes: [400,401,403]
+
+- if the `id` is not a valid ObjectId
+  - statusCode: 400
 
 ```json
 {
@@ -97,19 +99,21 @@ statuscodes: [400,401,403]
 {
   "title": "String",
   "description": "String",
-  "due_date": "UTC-time",
+  "due_date": "ISODate",
   "status": "String"
 }
 ```
 
 **Response**
 
+- status code: 204 - status created
+
 ```json
 {
   "id": "ObjectId",
   "title": "String",
   "description": "String",
-  "due_date": "UTC-time",
+  "due_date": "ISODate",
   "status": "String"
 }
 ```
@@ -124,24 +128,31 @@ statuscodes: [400,401,403]
 {
   "title": "String",
   "description": "String",
-  "due_date": "UTC-time",
+  "due_date": "ISODate",
   "status": "String"
 }
 ```
 
 **Response**
 
+- status code: 200 - status ok
+
 ```json
 {
   "id": "ObjectId",
   "title": "String",
   "description": "String",
-  "due_date": "UTC-time",
+  "due_date": "ISODate",
   "status": "String"
 }
 ```
 
 **Error handling**
+
+- if there is a bad request body
+  - statusCode: 400 - status bad request
+- if the task with that id is not found
+  - statusCode: 404 - status not found
 
 ```json
 {
@@ -287,7 +298,11 @@ curl --location 'http://localhost:8080/api/user/register' \
 ```
 
 **error handling**
-status code **400**-BadRequest
+
+- if there the user is not admin
+  - statusCode: 403 - forbidden
+- if there the user is not found
+  - statusCode: 404 - not found
 
 ```json
 {

@@ -70,7 +70,7 @@ func (uc *UserController) PromoteUser(c *gin.Context) {
 
 	if err := uc.userUsecase.PromoteUser(id); err != nil {
 		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while promoting user"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Error while promoting user"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "user promoted success!"})
