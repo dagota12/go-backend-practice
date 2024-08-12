@@ -15,12 +15,18 @@ type UserUsecase interface {
 	Login(data domain.LoginForm) (string, error)
 }
 type userUsecase struct {
-	userRepository repositories.UserRepository
+	userRepository    repositories.UserRepository
+	HashPassword      func(password string) (string, error)
+	CheckPasswordHash func(password string, hash string) bool
+	GenerateToken     func(userId string, role string) (string, error)
 }
 
 func NewUserUsecase(userRepository repositories.UserRepository) UserUsecase {
 	return &userUsecase{
-		userRepository: userRepository,
+		userRepository:    userRepository,
+		HashPassword:      infrastructure.HashPassword,
+		CheckPasswordHash: infrastructure.CheckPasswordHash,
+		GenerateToken:     infrastructure.GenerateToken,
 	}
 }
 func (u userUsecase) Login(data domain.LoginForm) (string, error) {
@@ -30,11 +36,11 @@ func (u userUsecase) Login(data domain.LoginForm) (string, error) {
 		return "", err
 	}
 	//check password
-	if valid := infrastructure.CheckPasswordHash(data.Password, user.Password); !valid {
+	if valid := u.CheckPasswordHash(data.Password, user.Password); !valid {
 		return "", errors.New("password doesn't match")
 	}
 	//generate jwt token
-	token, err := infrastructure.GenerateToken(user.ID.Hex(), user.Role)
+	token, err := u.GenerateToken(user.ID.Hex(), user.Role)
 	if err != nil {
 		return "", err
 	}

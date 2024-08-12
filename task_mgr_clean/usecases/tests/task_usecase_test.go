@@ -63,7 +63,6 @@ func (s *TaskUsecaseSuite) SetupSuite() {
 	mockRepo := new(TaskRepoMock)
 	s.usecase = usecases.NewTaskUsecase(mockRepo)
 	s.repository = mockRepo
-	s.repository.On("CreateTask", mock.Anything).Return(domain.Task{}, nil)
 
 }
 func (s *TaskUsecaseSuite) TestCreateTask() {
@@ -74,11 +73,42 @@ func (s *TaskUsecaseSuite) TestCreateTask() {
 		DueDate:     time.Time{},
 		Status:      "pending",
 	}
+	s.repository.On("CreateTask", newTask).Return(newTask, nil)
 
 	_, err := s.usecase.CreateTask(newTask)
 	require.NoError(s.T(), err, "Failed to create task")
 
 	// require.Equal(s.T(), newTask.Title, created.Title)
+}
+func (s *TaskUsecaseSuite) TestGetTasks() {
+
+	s.repository.On("GetTasks").Return([]domain.Task{})
+	tasks := s.usecase.GetTasks()
+	//check the return type
+	require.IsType(s.T(), []domain.Task{}, tasks)
+}
+func (s *TaskUsecaseSuite) TestGetUserTasks() {
+	s.repository.On("GetUserTasks", mock.Anything).Return([]domain.Task{})
+
+	tasks := s.usecase.GetUserTasks("userid")
+	require.IsType(s.T(), []domain.Task{}, tasks)
+}
+func (s *TaskUsecaseSuite) TestGetTask() {
+	s.repository.On("GetTask", mock.Anything).Return(domain.Task{}, nil)
+	task, err := s.usecase.GetTask("taskid")
+	require.NoError(s.T(), err, "Failed to get task")
+	require.IsType(s.T(), domain.Task{}, task)
+}
+func (s *TaskUsecaseSuite) TestUpdateTask() {
+	s.repository.On("UpdateTask", mock.Anything, mock.Anything).Return(domain.Task{}, nil)
+	task, err := s.usecase.UpdateTask("taskid", domain.Task{})
+	require.NoError(s.T(), err, "Failed to update task")
+	require.IsType(s.T(), domain.Task{}, task)
+}
+func (s *TaskUsecaseSuite) TestDeleteTask() {
+	s.repository.On("DeleteTask", mock.Anything).Return(nil)
+	err := s.usecase.DeleteTask("taskid")
+	require.NoError(s.T(), err, "Failed to delete task")
 }
 
 func TestTaksUsecase(t *testing.T) {
