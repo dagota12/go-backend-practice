@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type UserRepoMock struct {
@@ -49,13 +50,53 @@ func TestUserLogin(t *testing.T) {
 	}
 	userRepo.On("FilterUser", data.Username).Return(user, nil)
 
-	// userRepo.On("Login", data).Return("token", nil)
-
 	userUsecase := usecases.NewUserUsecase(userRepo)
 	// userUsecase.
 	token, err := userUsecase.Login(data)
 	require.NoError(t, err, "failed to login")
-	t.Log(token)
+	// t.Log(token)
 	require.Greater(t, len(token), 0)
+	userRepo.AssertExpectations(t)
+}
+func TestGetUsers(t *testing.T) {
+	userRepo := new(UserRepoMock)
+	userRepo.On("GetUsers").Return([]domain.UserOut{
+		{
+			ID:       primitive.NewObjectID(),
+			Username: "brad",
+			Role:     "user",
+		},
+	}, nil)
+	userUsecase := usecases.NewUserUsecase(userRepo)
+	users := userUsecase.GetUsers()
+	require.Equal(t, 1, len(users))
+	userRepo.AssertExpectations(t)
+}
+
+func TestPromoteUser(t *testing.T) {
+	userRepo := new(UserRepoMock)
+	userRepo.On("PromoteUser", mock.Anything).Return(nil)
+	userUsecase := usecases.NewUserUsecase(userRepo)
+	err := userUsecase.PromoteUser("66b3876f2c78431256a57b41")
+	require.NoError(t, err)
+	userRepo.AssertExpectations(t)
+}
+
+func TestCreateUser(t *testing.T) {
+	newUser := domain.User{
+		ID:       primitive.NewObjectID(),
+		Username: "user2",
+		Password: "test",
+		Role:     "user",
+	}
+	userRepo := new(UserRepoMock)
+	userRepo.On("FilterUser", newUser.Username).Return(domain.User{}, nil)
+	userRepo.On("GetUsers").Return([]domain.UserOut{}, nil)
+	//when create user is called with any input just retunrn anything
+	userRepo.On("CreateUser", mock.Anything).Return(newUser, nil)
+
+	userUsecase := usecases.NewUserUsecase(userRepo)
+	_, err := userUsecase.CreateUser(newUser)
+	require.NoError(t, err)
 	userRepo.AssertExpectations(t)
 }
