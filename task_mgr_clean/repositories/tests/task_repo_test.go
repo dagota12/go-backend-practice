@@ -10,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -40,6 +41,13 @@ func (suite *TaskRepoSuite) TearDownSuite() {
 	//drop task collection
 	defer suite.client.Disconnect(context.TODO())
 	defer suite.collection.Drop(context.TODO())
+
+}
+
+// delete all tasks after each test for consistency
+func (suite *TaskRepoSuite) TeaDownTest() {
+	fmt.Println("Tearing down test")
+	suite.collection.DeleteMany(context.TODO(), bson.M{})
 
 }
 func (suite *TaskRepoSuite) TestCreateTask() {

@@ -42,7 +42,7 @@ func (suite *UserRepoSuite) TearDownSuite() {
 	defer suite.collection.Drop(context.TODO())
 }
 
-// delete all users after each test
+// delete all users after each test for consistency
 func (suite *UserRepoSuite) TearDownTest() {
 
 	//delete all users after each test
