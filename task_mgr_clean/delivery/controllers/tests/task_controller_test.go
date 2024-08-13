@@ -91,7 +91,7 @@ func (s *TaskControllerSuite) SetupSuite() {
 
 }
 
-func (s *TaskControllerSuite) TearDownTest() {
+func (s *TaskControllerSuite) TearDownSuite() {
 	defer s.httpServer.Close()
 }
 func (s *TaskControllerSuite) TestCreateTask() {
@@ -119,7 +119,68 @@ func (s *TaskControllerSuite) TestCreateTask() {
 	s.usecase.AssertExpectations(s.T())
 
 }
+func (s *TaskControllerSuite) TestGetTask() {
+	s.usecase.On("GetTask", "1").Return(domain.Task{Title: "task 1"}, nil)
 
-func TestTaskCntroller(t *testing.T) {
+	response, err := http.Get(s.httpServer.URL + "/task/1")
+
+	require.NoError(s.T(), err, "faild to make request to get task")
+	defer response.Body.Close()
+	require.Equal(s.T(), http.StatusOK, response.StatusCode)
+	s.usecase.AssertExpectations(s.T())
+}
+
+func (s *TaskControllerSuite) TestGetTasks() {
+	s.usecase.On("GetTasks").Return([]domain.Task{{Title: "task 1"}, {Title: "task 2"}}, nil)
+
+	response, err := http.Get(s.httpServer.URL + "/task/all")
+	require.NoError(s.T(), err, "faild to make request to get tasks")
+
+	defer response.Body.Close()
+
+	require.Equal(s.T(), http.StatusOK, response.StatusCode)
+	s.usecase.AssertExpectations(s.T())
+}
+func (s *TaskControllerSuite) TestUpdateTask() {
+
+	task := domain.Task{
+		Title:       "demo Title",
+		Description: "erathostes",
+		DueDate:     time.Now().AddDate(0, 0, 1),
+		Status:      "pending",
+	}
+
+	s.usecase.On("UpdateTask", "1", task).Return(task, nil)
+
+	body, err := json.Marshal((task))
+	require.NoError(s.T(), err, "Failed to marshal task")
+
+	req, err := http.NewRequest("PUT", s.httpServer.URL+"/task/1", bytes.NewBuffer(body))
+	require.NoError(s.T(), err, "faild to make request to get task")
+
+	req.Header.Set("Content-Type", "application/json")
+
+	response, err := http.DefaultClient.Do(req)
+	require.NoError(s.T(), err, "faild to make request to update task")
+	defer response.Body.Close()
+
+	require.Equal(s.T(), http.StatusOK, response.StatusCode)
+
+}
+func (s *TaskControllerSuite) TestDeleteTask() {
+
+	s.usecase.On("DeleteTask", "1").Return(nil)
+
+	req, err := http.NewRequest("DELETE", s.httpServer.URL+"/task/1", nil)
+
+	require.NoError(s.T(), err, "faild to make request to get task")
+
+	req.Header.Set("Content-Type", "application/json")
+	response, err := http.DefaultClient.Do(req)
+	require.NoError(s.T(), err, "faild to make task delete request")
+
+	require.Equal(s.T(), http.StatusNoContent, response.StatusCode)
+}
+func TestTaskController(t *testing.T) {
 	suite.Run(t, new(TaskControllerSuite))
 }
