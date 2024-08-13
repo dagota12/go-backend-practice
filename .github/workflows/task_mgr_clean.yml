@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - "task_mgr_clean/**"
+      - ".github/workflows/**"
   pull_request:
     paths:
       - "task_mgr_clean/**"
