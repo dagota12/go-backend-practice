@@ -39,6 +39,10 @@ jobs:
         working-directory: task_mgr_clean
 
       - name: Run tests
+        env:
+          DB_URI: ${{ secrets.DB_URI }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: go test -v ./...
         working-directory: task_mgr_clean
 
