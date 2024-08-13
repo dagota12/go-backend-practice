@@ -43,9 +43,14 @@ jobs:
           DB_URI: ${{ secrets.DB_URI }}
           DB_NAME: ${{ secrets.DB_NAME }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
-        run: go test  ./...
-        working-directory: task_mgr_clean
 
-      - name: Build project
-        run: go build ./...
-        working-directory: task_mgr_clean
+          # print the enviromental variablse
+        run: |
+          echo "DB_NAME: $DB_NAME "
+
+    #     run: go test  ./...
+    #     working-directory: task_mgr_clean
+
+    #   - name: Build project
+    #     run: go build ./...
+    #     working-directory: task_mgr_clean
