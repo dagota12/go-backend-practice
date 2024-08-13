@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"errors"
 	"goPractice/task_manager/domain"
 	"goPractice/task_manager/repositories"
 )
@@ -29,6 +30,11 @@ func (t *taskUsecase) GetTask(id string) (domain.Task, error) {
 
 // CreateTask implements TaksUsecase.
 func (t *taskUsecase) CreateTask(task domain.Task) (domain.Task, error) {
+
+	if task.Title == "" || task.Description == "" {
+		return task, errors.New("title and description is required")
+	}
+
 	task, err := t.taskRepository.CreateTask(task)
 	return task, err
 }
@@ -45,6 +51,10 @@ func (t *taskUsecase) GetUserTasks(user_id string) []domain.Task {
 
 // UpdateTask implements TaksUsecase.
 func (t *taskUsecase) UpdateTask(id string, task domain.Task) (domain.Task, error) {
+
+	if task.Title == "" || task.Description == "" {
+		return task, errors.New("title and description is required")
+	}
 	return t.taskRepository.UpdateTask(id, task)
 }
 

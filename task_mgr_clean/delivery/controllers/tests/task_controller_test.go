@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"goPractice/task_manager/delivery/controllers"
 	"goPractice/task_manager/domain"
+	"goPractice/task_manager/mocks"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -67,7 +68,7 @@ func (s *TaskControllerSuite) SetupSuite() {
 
 	router := gin.Default()
 	taskG := router.Group("/task")
-	// taskG.Use(infrastructure.Authorize("user", "admin"))
+	taskG.Use(mocks.Authorize("admin"))
 
 	taskG.GET("/", controller.GetUserTasks)
 	taskG.GET("/:id", controller.GetTask)
@@ -129,7 +130,21 @@ func (s *TaskControllerSuite) TestGetTask() {
 	require.Equal(s.T(), http.StatusOK, response.StatusCode)
 	s.usecase.AssertExpectations(s.T())
 }
+func (s *TaskControllerSuite) TestGetUserTasks() {
+	s.usecase.On("GetUserTasks", "1").Return([]domain.Task{{Title: "task 1"}, {Title: "task 2"}}, nil)
 
+	response, err := http.Get(s.httpServer.URL + "/task")
+
+	require.NoError(s.T(), err, "faild to make request to get task")
+	defer response.Body.Close()
+
+	tasks := []domain.Task{}
+	json.NewDecoder(response.Body).Decode(&tasks)
+	s.T().Log(tasks)
+
+	require.Equal(s.T(), http.StatusOK, response.StatusCode)
+	s.usecase.AssertExpectations(s.T())
+}
 func (s *TaskControllerSuite) TestGetTasks() {
 	s.usecase.On("GetTasks").Return([]domain.Task{{Title: "task 1"}, {Title: "task 2"}}, nil)
 
