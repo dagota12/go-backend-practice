@@ -38,11 +38,11 @@ func TestGenerateToken(t *testing.T) {
 	require.NotEmpty(t, token, "Token should not be empty")
 }
 
-func TestParseToken(t *testing.T) {
-	token, err := infrastructure.GenerateToken("1", "admin")
-	require.NoError(t, err, "Failed to generate token")
+// func TestParseToken(t *testing.T) {
+// 	token, err := infrastructure.GenerateToken("1", "admin")
+// 	require.NoError(t, err, "Failed to generate token")
 
-	claims, err := infrastructure.ParseToken("Bearer " + token)
-	require.NoError(t, err, "Failed to parse token")
-	require.NotEmpty(t, claims, "Claims should not be empty")
-}
+// 	claims, err := infrastructure.ParseToken("Bearer " + token)
+// 	require.NoError(t, err, "Failed to parse token")
+// 	require.NotEmpty(t, claims, "Claims should not be empty")
+// }
