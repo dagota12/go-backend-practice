@@ -2,6 +2,8 @@ package infrastructure
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -15,17 +17,18 @@ type Claims struct {
 }
 
 func GenerateToken(userID string, role string) (string, error) {
+	exp_time, _ := strconv.Atoi(os.Getenv("EXP_TIME"))
 	claims := Claims{
 		UserID: userID,
 		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(EXP_TIME))),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(exp_time))),
 		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	return token.SignedString([]byte(JWT_SECRET))
+	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 }
 
 func ParseToken(authHeader string) (Claims, error) {

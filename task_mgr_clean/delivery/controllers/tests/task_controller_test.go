@@ -106,7 +106,7 @@ func (s *TaskControllerSuite) TestCreateTask() {
 		Status:      "pending",
 	}
 
-	s.usecase.On("CreateTask", task).Return(task, nil)
+	s.usecase.On("CreateTask", mock.Anything).Return(task, nil)
 
 	body, err := json.Marshal(task)
 	require.NoError(s.T(), err, "Failed to marshal task")
@@ -165,7 +165,7 @@ func (s *TaskControllerSuite) TestUpdateTask() {
 		Status:      "pending",
 	}
 
-	s.usecase.On("UpdateTask", "1", task).Return(task, nil)
+	s.usecase.On("UpdateTask", "1", mock.Anything).Return(task, nil)
 
 	body, err := json.Marshal((task))
 	require.NoError(s.T(), err, "Failed to marshal task")

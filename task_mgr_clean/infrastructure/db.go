@@ -18,7 +18,9 @@ var EXP_TIME int
 
 func init() {
 	log.Println("loading env...")
-	godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found or failed to load it")
+	}
 	DB_URI = os.Getenv("DB_URI")
 	DB_NAME = os.Getenv("DB_NAME")
 	JWT_SECRET = os.Getenv("JWT_SECRET")

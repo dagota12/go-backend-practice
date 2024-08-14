@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"goPractice/task_manager/domain"
 	"goPractice/task_manager/repositories"
+	"os"
 	"testing"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"go.mongodb.org/mongo-driver/bson"
@@ -27,7 +29,8 @@ type TaskRepoSuite struct {
 
 func (suite *TaskRepoSuite) SetupSuite() {
 	fmt.Println("Setting up test suite")
-	options := options.Client().ApplyURI("mongodb://localhost:27017")
+	godotenv.Load("../../.env")
+	options := options.Client().ApplyURI(os.Getenv("DB_URI"))
 	client, err := mongo.Connect(context.TODO(), options)
 	require.NoError(suite.T(), err, "Failed to connect to MongoDB")
 
