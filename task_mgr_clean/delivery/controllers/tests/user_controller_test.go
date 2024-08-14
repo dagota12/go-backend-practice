@@ -3,6 +3,7 @@ package tests
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"goPractice/task_manager/delivery/controllers"
 	"goPractice/task_manager/domain"
 	"goPractice/task_manager/mocks"
@@ -94,6 +95,44 @@ func (s *UserControllerSuite) TestUserLogin() {
 
 	require.Equal(s.T(), http.StatusOK, response.StatusCode)
 	s.usecase.AssertExpectations(s.T())
+}
+
+// test userlogin with wrong password
+func (s *UserControllerSuite) TestUserLogin_WrongPassword() {
+
+	data := domain.LoginForm{
+		Username: "testuser",
+		Password: "wrongpwd",
+	}
+	s.usecase.On("Login", data).Return("", errors.New("wrong password"))
+
+	body, err := json.Marshal(data)
+	require.NoError(s.T(), err, "Failed to marshal user")
+
+	response, err := http.Post(s.httpServer.URL+"/user/login", "application/json", bytes.NewBuffer(body))
+	require.NoError(s.T(), err, "faild to create user can't send request")
+	defer response.Body.Close()
+
+	require.Equal(s.T(), http.StatusUnauthorized, response.StatusCode)
+	s.usecase.AssertExpectations(s.T())
+
+}
+
+// test userlogin with wrong password
+func (s *UserControllerSuite) TestUserLogin_NoFormData() {
+
+	data := domain.LoginForm{}
+
+	body, err := json.Marshal(data)
+	require.NoError(s.T(), err, "Failed to marshal user")
+
+	response, err := http.Post(s.httpServer.URL+"/user/login", "application/json", bytes.NewBuffer(body))
+	require.NoError(s.T(), err, "faild to create user can't send request")
+	defer response.Body.Close()
+
+	require.Equal(s.T(), http.StatusBadRequest, response.StatusCode)
+	s.usecase.AssertExpectations(s.T())
+
 }
 func (s *UserControllerSuite) TestPromoteUser() {
 	s.usecase.On("PromoteUser", "1").Return(nil)

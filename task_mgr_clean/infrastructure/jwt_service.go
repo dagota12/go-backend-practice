@@ -17,7 +17,7 @@ type Claims struct {
 }
 
 func GenerateToken(userID string, role string) (string, error) {
-	exp_time, _ := strconv.Atoi(os.Getenv("EXP_TIME"))
+	exp_time, _ := strconv.Atoi(os.Getenv("JWT_EXP"))
 	claims := Claims{
 		UserID: userID,
 		Role:   role,
@@ -42,7 +42,7 @@ func ParseToken(authHeader string) (Claims, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method %v", token.Header["alg"])
 		}
-		return []byte(JWT_SECRET), nil
+		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
 
 	if err != nil {
